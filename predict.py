@@ -1,8 +1,8 @@
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from transformers import pipeline 
 
-model = AutoModelForSequenceClassification.from_pretrained("./my_sentiment_model")
-tokenizer = AutoTokenizer.from_pretrained("./my_sentiment_model")
+model = AutoModelForSequenceClassification.from_pretrained("./sentiment_model_3class")
+tokenizer = AutoTokenizer.from_pretrained("./sentiment_model_3class")
 
 sentiment = pipeline(
         "text-classification",
@@ -10,15 +10,20 @@ sentiment = pipeline(
         tokenizer=tokenizer
     )
 
-while True:
-    user_input = input("Enter Text: ")
+test_sentences = [
+    "this movie was absolutely amazing",
+    "the film was not good at all",
+    "what is that",
+    "what other fetish do you have?",
+    "i did not enjoy this at all",
+    "it was okay i guess",
+]
 
-    if user_input.lower() == 'quit':
-        break
+for sentence in test_sentences:
+    result = sentiment(sentence)
+    print(f"{sentence} --> {result}")
 
-    results = sentiment(user_input)
 
-    print(" Results: ", results)
 
     
 

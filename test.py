@@ -1,4 +1,6 @@
 from datasets import load_dataset
-dataset = load_dataset("mteb/tweet_sentiment_multilingual", "english")
+DATASETS='"cardiffnlp/twitter_sentiment_multilingual", "english"'
+
+dataset = load_dataset("Sp1786/multiclass-sentiment-analysis-dataset")
 print(dataset)
 print(dataset['train'][0]) 

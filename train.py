@@ -1,9 +1,10 @@
 from datasets import load_dataset  # Import the function to load datasets from Hugging Face
 
-DATASET=""
+DATASETS=("Sp1786/multiclass-sentiment-analysis-dataset")
 
-dataset = load_dataset("mteb/tweet_sentiment_multilingual", "english")
+dataset = load_dataset(DATASETS)
 dataset = dataset.map(lambda x: {'label': int(x['label'])})
+dataset = dataset.filter(lambda x: isinstance(x['text'], str) and len(x['text']) > 0)
 
     
 PRETRAINED_MODEL = "distilbert-base-uncased"  # Store the model name as a variable so we can reuse it
@@ -44,16 +45,25 @@ training_args = TrainingArguments(
     logging_dir="./logs",  # Save training logs here
 )
 
+import numpy as np
+
+def compute_metrics(eval_pred):
+    logits, labels = eval_pred
+    predictions = np.argmax(logits, axis=-1)
+    accuracy = (predictions == labels).mean()
+    return {"accuracy": accuracy}
+
 from transformers import Trainer  # Import the Trainer class that handles the training loop
 
 trainer = Trainer(
     model=model,  # The model to train
     args=training_args,  # The training configuration we defined above
-    # train_dataset=tokenized_dataset["train"].select(range(3000)),  # Use only 3000 examples for training
-    # eval_dataset=tokenized_dataset["validation"].select(range(300)),  # Use only 300 examples for validation
-    train_dataset=tokenized_dataset["train"],  # Use only 3000 examples for training
-    eval_dataset=tokenized_dataset["validation"],  # Use only 300 examples for validation
+    train_dataset=tokenized_dataset["train"].select(range(4000)),  # Use only 4000 examples for training
+    eval_dataset=tokenized_dataset["validation"].select(range(500)),  # Use only 500 examples for validation
+    # train_dataset=tokenized_dataset["train"],  # Use only 4000 examples for training
+    # eval_dataset=tokenized_dataset["validation"],  # Use only 500 examples for validation
     data_collator=data_collator,  # Use dynamic padding per batch
+    compute_metrics=compute_metrics,
 )
 
 trainer.train()
